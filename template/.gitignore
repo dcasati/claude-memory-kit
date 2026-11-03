@@ -1,8 +1,8 @@
-# Kit mémoire : le scratchpad est une mémoire de travail jetable — pas versionnée
-memoire/scratchpad/*
-!memoire/scratchpad/README.md
+# Memory kit: the scratchpad is disposable working memory — not versioned
+memory/scratchpad/*
+!memory/scratchpad/README.md
 
-# Réglages locaux personnels de Claude Code (non partagés)
+# Personal local Claude Code settings (not shared)
 .claude/settings.local.json
 
 # macOS

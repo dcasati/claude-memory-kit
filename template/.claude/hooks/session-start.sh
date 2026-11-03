@@ -1,39 +1,39 @@
 #!/bin/bash
 # ============================================================================
-# Hook SessionStart — « chargement progressif » de la mémoire
-# (recommandation Lamis Mukta : injecter un INDEX léger, jamais tout le stock)
+# SessionStart hook — "progressive disclosure" of the memory
+# (Lamis Mukta's recommendation: inject a lightweight INDEX, never the whole store)
 #
-# Ce que fait ce script : tout ce qu'il affiche (echo) est ajouté au contexte
-# de l'agent au démarrage de la session. On n'injecte donc que :
-#   1. l'index de la mémoire (une ligne par souvenir),
-#   2. les 10 dernières erreurs journalisées (pour ne pas les répéter),
-#   3. une alerte s'il y a des propositions de dreaming en attente.
+# What this script does: everything it prints (echo) is added to the agent's
+# context when the session starts. So we only inject:
+#   1. the memory index (one line per memory),
+#   2. the 10 most recent logged errors (so they aren't repeated),
+#   3. an alert if dreaming proposals are pending.
 # ============================================================================
 
-MEM="$CLAUDE_PROJECT_DIR/memoire"
+MEM="$CLAUDE_PROJECT_DIR/memory"
 
-# 1. L'index (le catalogue de la bibliothèque, pas les livres)
-if [ -f "$MEM/MEMOIRE.md" ]; then
-  echo "## Mémoire du projet (index — ouvre les fichiers seulement si pertinent)"
-  # grep -v retire les lignes de commentaires HTML pour économiser des tokens
-  grep -v '^<!--' "$MEM/MEMOIRE.md" | grep -v '^     '
+# 1. The index (the library catalog, not the books)
+if [ -f "$MEM/MEMORY.md" ]; then
+  echo "## Project memory (index — open files only when relevant)"
+  # grep -v strips HTML comment lines to save tokens
+  grep -v '^<!--' "$MEM/MEMORY.md" | grep -v '^     '
   echo
 fi
 
-# 2. Les erreurs récentes non traitées (celles marquées [traité] sont exclues)
-if [ -f "$MEM/erreurs/journal.md" ]; then
-  RECENTES=$(grep '^- ' "$MEM/erreurs/journal.md" | grep -v '\[traité\]' | tail -n 10)
-  if [ -n "$RECENTES" ]; then
-    echo "## Erreurs récentes journalisées (à ne pas répéter — voir memoire/erreurs/journal.md)"
-    echo "$RECENTES"
+# 2. Recent unhandled errors (lines marked [handled …] are excluded)
+if [ -f "$MEM/errors/log.md" ]; then
+  RECENT=$(grep '^- ' "$MEM/errors/log.md" | grep -v '\[handled' | tail -n 10)
+  if [ -n "$RECENT" ]; then
+    echo "## Recently logged errors (do not repeat — see memory/errors/log.md)"
+    echo "$RECENT"
     echo
   fi
 fi
 
-# 3. Propositions de dreaming en attente de validation humaine ?
-if ls "$MEM/propositions/"*dreaming*.md >/dev/null 2>&1; then
-  if ls "$MEM/propositions/"*dreaming*.md 2>/dev/null | grep -qv -- '-traite\.md$'; then
-    echo "⚠️ Des propositions de Dreaming attendent une validation humaine dans memoire/propositions/. Signale-le à l'utilisateur."
+# 3. Dreaming proposals awaiting human approval?
+if ls "$MEM/proposals/"*dreaming*.md >/dev/null 2>&1; then
+  if ls "$MEM/proposals/"*dreaming*.md 2>/dev/null | grep -qv -- '-done\.md$'; then
+    echo "⚠️ Dreaming proposals are awaiting human approval in memory/proposals/. Let the user know."
   fi
 fi
 

@@ -4,20 +4,20 @@
       "Read",
       "Grep",
       "Glob",
-      "Write(memoire/lecons/**)",
-      "Write(memoire/scratchpad/**)",
-      "Write(memoire/propositions/**)",
-      "Edit(memoire/MEMOIRE.md)",
-      "Edit(memoire/lecons/**)",
-      "Edit(memoire/scratchpad/**)",
-      "Edit(memoire/propositions/**)",
+      "Write(memory/lessons/**)",
+      "Write(memory/scratchpad/**)",
+      "Write(memory/proposals/**)",
+      "Edit(memory/MEMORY.md)",
+      "Edit(memory/lessons/**)",
+      "Edit(memory/scratchpad/**)",
+      "Edit(memory/proposals/**)",
       "Bash(grep *)",
       "Bash(ls *)"
     ],
     "deny": [
-      "Write(memoire/organisation/**)",
-      "Edit(memoire/organisation/**)",
-      "Write(memoire/erreurs/journal.md)",
+      "Write(memory/organization/**)",
+      "Edit(memory/organization/**)",
+      "Write(memory/errors/log.md)",
       "Bash(rm -rf *)",
       "Bash(sudo *)",
       "Read(./.env)",
@@ -33,7 +33,7 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh",
-            "statusMessage": "Chargement de la mémoire du projet…"
+            "statusMessage": "Loading project memory…"
           }
         ]
       }
@@ -44,7 +44,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/garde-memoire.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memory-guard.sh"
           }
         ]
       }
@@ -55,7 +55,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memoire-git.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memory-git.sh"
           }
         ]
       }
@@ -65,7 +65,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memoire-erreur.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/memory-error.sh"
           }
         ]
       }
@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/garde-tokens.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/token-guard.sh"
           }
         ]
       }

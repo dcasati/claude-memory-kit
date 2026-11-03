@@ -1,36 +1,37 @@
-# Publier ce kit sur GitHub — pas à pas
+# Publishing this kit on GitHub — step by step
 
-> Guide pour mettre ce dépôt local en ligne sur votre compte GitHub
-> (exemple avec le compte `Luclegay`). Chaque commande est expliquée.
+> A guide to putting this local repository online under your GitHub account
+> (example with the `Luclegay` account — replace it with yours). Every command
+> is explained.
 
-## Étape 1 — Vérifier l'état local
+## Step 1 — Check the local state
 
 ```bash
 cd ~/Desktop/claude-memory-kit
 git status
 ```
-`git status` montre l'état du dépôt. Vous devez voir « nothing to commit, working
-tree clean » (tout est déjà enregistré). Si des fichiers apparaissent en rouge :
+`git status` shows the state of the repository. You should see "nothing to commit,
+working tree clean" (everything is already saved). If files show up in red:
 
 ```bash
-git add -A                            # « prépare tous les fichiers »
-git commit -m "Ajustements avant publication"   # « enregistre avec ce message »
+git add -A                                  # "stage all files"
+git commit -m "Tweaks before publishing"    # "save with this message"
 ```
 
-## Étape 2 — Créer le dépôt sur GitHub (interface web, le plus simple)
+## Step 2 — Create the repository on GitHub (web interface, the simplest way)
 
-1. Allez sur https://github.com/new (connecté à votre compte).
-2. **Repository name** : `claude-memory-kit`
-3. **Description** : `Mémoire en fichiers + apprentissage des erreurs + Dreaming pour Claude Code (d'après la conférence de Lamis Mukta, Anthropic)`
-4. Choisissez **Public**.
-5. ⚠️ Ne cochez AUCUNE case (« Add a README », « Add .gitignore », « license ») :
-   le dépôt local les contient déjà — les cocher créerait des conflits.
-6. Cliquez **Create repository**.
+1. Go to https://github.com/new (signed in to your account).
+2. **Repository name**: `claude-memory-kit`
+3. **Description**: `File-based memory + learning from mistakes + Dreaming for Claude Code (based on Lamis Mukta's talk, Anthropic)`
+4. Choose **Public**.
+5. ⚠️ Do NOT tick ANY box ("Add a README", "Add .gitignore", "license"):
+   the local repository already contains them — ticking them would create conflicts.
+6. Click **Create repository**.
 
-## Étape 3 — Relier le dépôt local à GitHub et envoyer
+## Step 3 — Link the local repository to GitHub and push
 
-GitHub affiche alors une page d'instructions. C'est la section
-« …or push an existing repository from the command line » qui nous concerne :
+GitHub then shows an instructions page. The section that concerns us is
+"…or push an existing repository from the command line":
 
 ```bash
 cd ~/Desktop/claude-memory-kit
@@ -39,29 +40,29 @@ git branch -M main
 git push -u origin main
 ```
 
-Ce que fait chaque ligne :
-- `git remote add origin <url>` : « le dépôt en ligne s'appelle *origin* et vit à
-  cette adresse » ;
-- `git branch -M main` : renomme la branche courante en `main` (le standard) ;
-- `git push -u origin main` : envoie tout vers GitHub et mémorise la liaison
-  (les prochains envois seront un simple `git push`).
+What each line does:
+- `git remote add origin <url>`: "the online repository is called *origin* and
+  lives at this address";
+- `git branch -M main`: renames the current branch to `main` (the standard);
+- `git push -u origin main`: sends everything to GitHub and remembers the link
+  (future pushes will be a simple `git push`).
 
-Si le Terminal demande un mot de passe : GitHub n'accepte plus les mots de passe,
-il faut un **jeton d'accès** (Settings → Developer settings → Personal access
-tokens → *Generate new token (classic)*, cochez `repo`) à coller à la place du
-mot de passe. Alternative plus confortable : installer l'outil officiel
-`brew install gh` puis `gh auth login`, et l'authentification est gérée pour vous.
+If the Terminal asks for a password: GitHub no longer accepts passwords,
+you need an **access token** (Settings → Developer settings → Personal access
+tokens → *Generate new token (classic)*, tick `repo`) to paste instead of the
+password. A more comfortable alternative: install the official tool
+`brew install gh` then run `gh auth login`, and authentication is handled for you.
 
-## Étape 4 — Vérifier
+## Step 4 — Verify
 
-Ouvrez https://github.com/Luclegay/claude-memory-kit : le README s'affiche en
-page d'accueil, avec le schéma. C'est en ligne ! 🎉
+Open https://github.com/Luclegay/claude-memory-kit: the README shows up as
+the home page, with the diagram. It's live! 🎉
 
-## Pour les mises à jour futures
+## For future updates
 
 ```bash
 cd ~/Desktop/claude-memory-kit
 git add -A
-git commit -m "Description courte de la modification"
+git commit -m "Short description of the change"
 git push
 ```

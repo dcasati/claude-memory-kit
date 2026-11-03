@@ -1,108 +1,108 @@
 #!/bin/bash
 # ============================================================================
-# install.sh — installe le kit mémoire dans un projet
+# install.sh — installs the memory kit into a project
 #
-# Usage :
-#   ./install.sh /chemin/vers/votre/projet
-#   ./install.sh .          # installer dans le dossier courant
+# Usage:
+#   ./install.sh /path/to/your/project
+#   ./install.sh .          # install into the current folder
 #
-# Ce que fait le script, dans l'ordre :
-#   1. copie memoire/, .claude/ (hooks, skills, settings) et scripts/ ;
-#   2. ne casse RIEN d'existant : CLAUDE.md existant → on ajoute une section ;
-#      settings.json existant → le nôtre est posé à côté avec un mode d'emploi ;
-#   3. rend les scripts exécutables ;
-#   4. crée un dépôt git s'il n'y en a pas (indispensable au versionnage de la
-#      mémoire) et fait un premier commit.
+# What the script does, in order:
+#   1. copies memory/, .claude/ (hooks, skills, settings) and scripts/;
+#   2. breaks NOTHING that exists: existing CLAUDE.md → a section is appended;
+#      existing settings.json → ours is placed alongside with instructions;
+#   3. makes the scripts executable;
+#   4. creates a git repo if there isn't one (essential for memory
+#      versioning) and makes a first commit.
 # ============================================================================
 set -euo pipefail
 
-KIT="$(cd "$(dirname "$0")" && pwd)"          # dossier du kit (là où vit ce script)
-CIBLE="${1:-}"
+KIT="$(cd "$(dirname "$0")" && pwd)"          # kit folder (where this script lives)
+TARGET="${1:-}"
 
-if [ -z "$CIBLE" ]; then
-  echo "Usage : ./install.sh /chemin/vers/votre/projet" >&2
+if [ -z "$TARGET" ]; then
+  echo "Usage: ./install.sh /path/to/your/project" >&2
   exit 1
 fi
-CIBLE="$(cd "$CIBLE" 2>/dev/null && pwd)" || { echo "❌ Dossier introuvable : $1" >&2; exit 1; }
+TARGET="$(cd "$TARGET" 2>/dev/null && pwd)" || { echo "❌ Folder not found: $1" >&2; exit 1; }
 
-if [ "$CIBLE" = "$KIT" ]; then
-  echo "❌ Installez le kit dans un AUTRE dossier que le kit lui-même." >&2
+if [ "$TARGET" = "$KIT" ]; then
+  echo "❌ Install the kit into a DIFFERENT folder than the kit itself." >&2
   exit 1
 fi
 
-echo "📦 Installation du kit mémoire dans : $CIBLE"
+echo "📦 Installing the memory kit into: $TARGET"
 
-# --- 1. Le dossier memoire/ (sans écraser une mémoire existante) ------------
-if [ -d "$CIBLE/memoire" ]; then
-  echo "   memoire/ existe déjà → conservé tel quel (aucune modification)."
+# --- 1. The memory/ folder (without overwriting an existing memory) ---------
+if [ -d "$TARGET/memory" ]; then
+  echo "   memory/ already exists → kept as is (no changes)."
 else
-  cp -R "$KIT/template/memoire" "$CIBLE/memoire"
-  echo "   memoire/ créé (index, organisation, leçons, journal, scratchpad, propositions)."
+  cp -R "$KIT/template/memory" "$TARGET/memory"
+  echo "   memory/ created (index, organization, lessons, error log, scratchpad, proposals)."
 fi
 
-# --- 2. CLAUDE.md (ajout, jamais écrasement) --------------------------------
-if [ -f "$CIBLE/CLAUDE.md" ]; then
-  if grep -q "kit « Dreaming »" "$CIBLE/CLAUDE.md"; then
-    echo "   CLAUDE.md contient déjà les règles du kit → inchangé."
+# --- 2. CLAUDE.md (append, never overwrite) ---------------------------------
+if [ -f "$TARGET/CLAUDE.md" ]; then
+  if grep -q '"Dreaming" kit' "$TARGET/CLAUDE.md"; then
+    echo "   CLAUDE.md already contains the kit's rules → unchanged."
   else
-    { echo; echo; cat "$KIT/template/CLAUDE.md"; } >> "$CIBLE/CLAUDE.md"
-    echo "   CLAUDE.md existant → règles du kit AJOUTÉES à la fin (rien d'écrasé)."
+    { echo; echo; cat "$KIT/template/CLAUDE.md"; } >> "$TARGET/CLAUDE.md"
+    echo "   Existing CLAUDE.md → kit rules APPENDED at the end (nothing overwritten)."
   fi
 else
-  cp "$KIT/template/CLAUDE.md" "$CIBLE/CLAUDE.md"
-  echo "   CLAUDE.md créé."
+  cp "$KIT/template/CLAUDE.md" "$TARGET/CLAUDE.md"
+  echo "   CLAUDE.md created."
 fi
 
-# --- 3. .claude/ : hooks, skills, settings ----------------------------------
-mkdir -p "$CIBLE/.claude"
-cp -R "$KIT/template/.claude/hooks" "$CIBLE/.claude/"
-mkdir -p "$CIBLE/.claude/skills"
-cp -R "$KIT/template/.claude/skills/." "$CIBLE/.claude/skills/"
-chmod +x "$CIBLE/.claude/hooks/"*.sh
-echo "   Hooks et skills installés (.claude/hooks, .claude/skills)."
+# --- 3. .claude/: hooks, skills, settings ------------------------------------
+mkdir -p "$TARGET/.claude"
+cp -R "$KIT/template/.claude/hooks" "$TARGET/.claude/"
+mkdir -p "$TARGET/.claude/skills"
+cp -R "$KIT/template/.claude/skills/." "$TARGET/.claude/skills/"
+chmod +x "$TARGET/.claude/hooks/"*.sh
+echo "   Hooks and skills installed (.claude/hooks, .claude/skills)."
 
-if [ -f "$CIBLE/.claude/settings.json" ]; then
-  cp "$KIT/template/.claude/settings.json" "$CIBLE/.claude/settings.kit-memoire.json"
-  echo "   ⚠️ .claude/settings.json existe déjà : le nôtre est posé à côté sous"
-  echo "      le nom settings.kit-memoire.json. Fusionnez les blocs \"hooks\" et"
-  echo "      \"permissions\" à la main (ou demandez à Claude de le faire)."
+if [ -f "$TARGET/.claude/settings.json" ]; then
+  cp "$KIT/template/.claude/settings.json" "$TARGET/.claude/settings.memory-kit.json"
+  echo "   ⚠️ .claude/settings.json already exists: ours is placed alongside as"
+  echo "      settings.memory-kit.json. Merge the \"hooks\" and \"permissions\""
+  echo "      blocks by hand (or ask Claude to do it)."
 else
-  cp "$KIT/template/.claude/settings.json" "$CIBLE/.claude/settings.json"
-  echo "   .claude/settings.json créé (permissions + hooks)."
+  cp "$KIT/template/.claude/settings.json" "$TARGET/.claude/settings.json"
+  echo "   .claude/settings.json created (permissions + hooks)."
 fi
 
-# --- 4. Scripts et .gitignore ------------------------------------------------
-mkdir -p "$CIBLE/scripts"
-cp "$KIT/template/scripts/dream.sh" "$KIT/template/scripts/rapport-tokens.sh" "$CIBLE/scripts/"
-chmod +x "$CIBLE/scripts/dream.sh" "$CIBLE/scripts/rapport-tokens.sh"
-echo "   scripts/dream.sh et scripts/rapport-tokens.sh installés."
+# --- 4. Scripts and .gitignore -----------------------------------------------
+mkdir -p "$TARGET/scripts"
+cp "$KIT/template/scripts/dream.sh" "$KIT/template/scripts/token-report.sh" "$TARGET/scripts/"
+chmod +x "$TARGET/scripts/dream.sh" "$TARGET/scripts/token-report.sh"
+echo "   scripts/dream.sh and scripts/token-report.sh installed."
 
-if [ -f "$CIBLE/.gitignore" ]; then
-  if ! grep -q "memoire/scratchpad" "$CIBLE/.gitignore"; then
-    { echo; cat "$KIT/template/.gitignore"; } >> "$CIBLE/.gitignore"
-    echo "   Règles ajoutées au .gitignore existant."
+if [ -f "$TARGET/.gitignore" ]; then
+  if ! grep -q "memory/scratchpad" "$TARGET/.gitignore"; then
+    { echo; cat "$KIT/template/.gitignore"; } >> "$TARGET/.gitignore"
+    echo "   Rules appended to the existing .gitignore."
   fi
 else
-  cp "$KIT/template/.gitignore" "$CIBLE/.gitignore"
-  echo "   .gitignore créé."
+  cp "$KIT/template/.gitignore" "$TARGET/.gitignore"
+  echo "   .gitignore created."
 fi
 
-# --- 5. git : indispensable au versionnage de la mémoire --------------------
-cd "$CIBLE"
+# --- 5. git: essential for memory versioning ---------------------------------
+cd "$TARGET"
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  echo "   Dépôt git déjà présent → parfait, le versionnage de la mémoire est actif."
+  echo "   git repo already present → great, memory versioning is active."
 else
   git init -q
-  echo "   Dépôt git créé (git init) — nécessaire pour l'historique de la mémoire."
+  echo "   git repo created (git init) — required for the memory history."
 fi
-git add CLAUDE.md .claude memoire scripts .gitignore 2>/dev/null || true
+git add CLAUDE.md .claude memory scripts .gitignore 2>/dev/null || true
 if ! git diff --cached --quiet 2>/dev/null; then
-  git commit -q -m "Installation du kit mémoire (claude-memory-kit)" --no-verify
-  echo "   Premier commit effectué."
+  git commit -q -m "Install the memory kit (claude-memory-kit)" --no-verify
+  echo "   First commit done."
 fi
 
 echo
-echo "✅ Terminé ! Prochaines étapes :"
-echo "   1. Ouvrez memoire/organisation/conventions.md et adaptez les règles à votre projet."
-echo "   2. Lancez \`claude\` dans $CIBLE : l'index mémoire se charge tout seul."
-echo "   3. Une fois par semaine : ./scripts/dream.sh"
+echo "✅ Done! Next steps:"
+echo "   1. Open memory/organization/conventions.md and adapt the rules to your project."
+echo "   2. Run \`claude\` in $TARGET: the memory index loads automatically."
+echo "   3. Once a week: ./scripts/dream.sh"
