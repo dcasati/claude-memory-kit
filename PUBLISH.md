@@ -22,7 +22,7 @@ git commit -m "Tweaks before publishing"    # "save with this message"
 
 1. Go to https://github.com/new (signed in to your account).
 2. **Repository name**: `claude-memory-kit`
-3. **Description**: `File-based memory + learning from mistakes + Dreaming for Claude Code (based on Lamis Mukta's talk, Anthropic)`
+3. **Description**: `File-based memory + learning from mistakes + Dreaming for GitHub Copilot CLI (based on Lamis Mukta's talk, Anthropic)`
 4. Choose **Public**.
 5. ⚠️ Do NOT tick ANY box ("Add a README", "Add .gitignore", "license"):
    the local repository already contains them — ticking them would create conflicts.

@@ -11,7 +11,7 @@ This is where the following land:
 
 1. Open the proposals file.
 2. For each proposal, replace `[ ]` with `[OK]` (accept) or `[NO]` (reject).
-3. Run `claude` then type `/dreaming apply`: only proposals marked `[OK]`
+3. Run `copilot` then type `/dreaming apply`: only proposals marked `[OK]`
    are applied; the file is then archived with a `-done.md` suffix.
 
 Nothing is applied automatically: **you decide** (an explicit recommendation

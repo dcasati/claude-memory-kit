@@ -2,9 +2,9 @@
 
 **AI agent** — an artificial-intelligence assistant capable of *acting* (reading
 files, running commands, writing code), not just chatting.
-Claude Code is an agent.
+GitHub Copilot CLI is an agent.
 
-**Session** — a working conversation with the agent, from launching `claude`
+**Session** — a working conversation with the agent, from launching `copilot`
 until you close it. Without memory, every session starts from scratch.
 
 **Context (context window)** — the model's "working memory": everything it
@@ -15,8 +15,13 @@ results). It is limited — hence the value of loading only the essentials.
 piece of a word; in practice 1 token ≈ 4 characters). It is the unit of
 consumption and billing. Fewer tokens = cheaper and faster.
 
-**CLAUDE.md** — a text file at the root of the project, read automatically at
-the start of each session: the agent's "standing instructions".
+**AGENTS.md** — a text file at the root of the project, read automatically at
+the start of each session: the agent's "standing instructions". (Claude Code
+uses `CLAUDE.md` for the same purpose; Copilot CLI reads both.)
+
+**AI credits** — the unit GitHub Copilot uses to bill model usage. `/usage`
+shows them for the current session; `scripts/token-report.sh` sums them for
+the project.
 
 **Markdown (.md)** — a plain-text format with light formatting
 (headings with `#`, lists with `-`). Readable by humans AND by agents;
@@ -38,12 +43,14 @@ scan the titles before pulling out a book.
 **Frontmatter** — the small block of information between `---` at the top of a
 file: name, description, date… The "summary on the book's spine".
 
-**Hook** — a small script that Claude Code runs automatically at a specific
+**Hook** — a small script that Copilot CLI runs automatically at a specific
 moment (startup, before/after an action, after a failure). The kit's
 guardrails are hooks: they apply mechanically, without depending on the AI.
 
-**Permissions** — the list of what the agent is allowed to do (in
-`.claude/settings.json`): allowances (`allow`) and prohibitions (`deny`).
+**Permissions** — what the agent may do without asking. Copilot CLI asks
+you before running commands or writing files, unless you pre-approve them
+(`--allow-tool`, `--allow-all-tools`). The kit's guard hook adds rules that
+apply even when everything is pre-approved.
 
 **git** — the file-history system used by developers.
 Each save ("commit") records who changed what, and when. The kit uses it
@@ -73,8 +80,9 @@ session (the agent splits its attention between the task and its memory).
 with sleep) that re-reads past sessions and memory, spots recurring patterns,
 and proposes improvements that the human approves. "Learning while you sleep."
 
-**Transcript** — the complete record of a session (messages, commands,
-errors), kept by Claude Code in `~/.claude/projects/`. It is Dreaming's raw
+**Transcript (session log)** — the complete record of a session (messages,
+commands, errors, token usage), kept by Copilot CLI in
+`~/.copilot/session-state/<session>/events.jsonl`. It is Dreaming's raw
 material.
 
 **Scratchpad** — the agent's draft: temporary, disposable notes, purged

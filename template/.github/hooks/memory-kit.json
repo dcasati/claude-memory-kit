@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/memory-kit/session-start.sh",
+        "timeoutSec": 15
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "create|edit|apply_patch|bash|powershell|view",
+        "bash": ".github/hooks/memory-kit/memory-guard.sh",
+        "timeoutSec": 15
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "matcher": "bash|powershell",
+        "bash": ".github/hooks/memory-kit/memory-error.sh",
+        "timeoutSec": 15
+      },
+      {
+        "type": "command",
+        "matcher": "create|edit|apply_patch|bash|powershell|task",
+        "bash": ".github/hooks/memory-kit/memory-git.sh",
+        "timeoutSec": 30
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/memory-kit/memory-error.sh",
+        "timeoutSec": 15
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/memory-kit/token-guard.sh",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

@@ -44,7 +44,7 @@ Rules: absolute dates, no secrets, 15 lines maximum, one error per file.
 
 1. Add a line to `memory/MEMORY.md`, under "Lessons learned".
 2. Open `memory/errors/log.md` and find the lines matching this error.
-   Annotate each one with the Edit tool by APPENDING ` [handled → lessons/<file>]`
+   Annotate each one with the file edit tool (not the shell) by APPENDING ` [handled → lessons/<file>]`
    at the end of the line, without removing any of the original text (the
    guardrail only allows this form of editing on the log).
 

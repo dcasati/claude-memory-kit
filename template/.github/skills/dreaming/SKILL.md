@@ -1,7 +1,6 @@
 ---
 name: dreaming
-description: Memory consolidation pass (out-of-band) — analyzes past sessions and the error log, spots recurring patterns, and proposes memory improvements backed by evidence. Run via scripts/dream.sh or /dreaming. Use the "apply" mode to execute approved proposals.
-disable-model-invocation: true
+description: Memory consolidation pass (out-of-band) — analyzes past sessions and the error log, spots recurring patterns, and proposes memory improvements backed by evidence. Run via scripts/dream.sh, or "/dreaming apply" to execute approved proposals. Only use when explicitly asked.
 ---
 
 # Dreaming — consolidating memory between sessions
@@ -25,14 +24,21 @@ changing lessons, the index, `organization/` — goes through a proposal.
 
 ### 2. Session collection
 - If `memory/scratchpad/dreaming-sessions.txt` exists (dropped by `dream.sh`),
-  it lists the transcripts to analyze: process those files — that is the
-  authorized budget.
-- Otherwise, take the `.jsonl` transcripts from the last 7 days in
-  `~/.claude/projects/<project-folder>/`, **5 files maximum**, most recent first.
-- **Token budget**: never read a whole transcript at once. For each file,
-  `grep` first for errors (`is_error`, `error`, `Failed`, `exit code`), tool
-  usage, and user messages expressing a correction or frustration ("no",
-  "not that", "I told you"). Only load the wider context around those points.
+  it lists the Copilot CLI session logs (`events.jsonl`) to analyze: process
+  those files — that is the authorized budget.
+- Otherwise, find this project's sessions yourself: folders in
+  `~/.copilot/session-state/` whose `workspace.yaml` has `cwd:` or `git_root:`
+  equal to the project root; take their `events.jsonl` from the last 7 days,
+  **5 sessions maximum**, most recent first. Skip sessions whose `name:`
+  starts with "Use the /dreaming skill" (previous dreaming passes).
+- **Token budget**: never read a whole `events.jsonl` at once (one JSON event
+  per line, often large). For each file, `grep` first for:
+  - failures: `"success":false`, `exit code [1-9]`, `"error"`;
+  - user messages: `"type":"user.message"`, especially corrections or
+    frustration ("no", "not that", "I told you", "again");
+  - hook denials: `Memory guardrail`.
+  Only load the wider context around those points (e.g. `grep -n` then read
+  a few lines around the hit with `sed -n`).
 
 ### 3. Pattern search (the heart of the work)
 Cross-reference the error log, existing lessons, and transcripts:
@@ -69,9 +75,10 @@ Order proposals from safest to most debatable. Maximum 10 per pass.
 
 ### 5. Allowed maintenance (no approval needed)
 - Delete files in `memory/scratchpad/` older than 7 days
-  (list them first, then delete file by file).
+  (list them first, then delete file by file with `rm memory/scratchpad/<file>`;
+  never touch `dreaming-sessions.txt`, `dream.sh` removes it).
 - Annotate `[handled → lessons/<file>]` on log lines covered by an
-  existing lesson.
+  existing lesson (file edit tool, appending to the end of the line only).
 
 ### 6. Final summary
 End with a summary: number of proposals, the 3 most important in one line
@@ -88,5 +95,6 @@ each, and the instruction: "Review in memory/proposals/ then run
 3. Ignore `[NO]` and `[ ]` left empty (they will be raised again at the next
    pass if the pattern persists).
 4. Update `memory/MEMORY.md` to reflect the changes.
-5. Rename the proposals file with the `-done.md` suffix.
+5. Rename the proposals file with the `-done.md` suffix, using the shell:
+   `mv memory/proposals/<file>.md memory/proposals/<file>-done.md`.
 6. Summarize what was applied / ignored.

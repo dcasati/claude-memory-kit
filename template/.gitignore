@@ -2,8 +2,8 @@
 memory/scratchpad/*
 !memory/scratchpad/README.md
 
-# Personal local Claude Code settings (not shared)
-.claude/settings.local.json
+# Personal local Copilot CLI settings (not shared)
+.github/copilot/settings.local.json
 
 # macOS
 .DS_Store
