@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# shfmt -i 2 -ci -w
+# No `set -e` on purpose: a hook must never fail the session it serves.
 # ============================================================================
 # agentStop hook — token / AI-credit consumption watchdog
 #
@@ -70,9 +72,15 @@ def already_alerted(level):
     """True if this level's alert was already emitted for this session
     (a small marker file in the temp directory acts as memory)."""
     marker = os.path.join(tempfile.gettempdir(), f"kitmem-{ev.short_session}-{level}")
-    if os.path.exists(marker):
+    try:
+        # O_EXCL + O_NOFOLLOW: never open (or truncate) a file planted by
+        # someone else, e.g. a symlink in a shared /tmp
+        os.close(os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                         | getattr(os, "O_NOFOLLOW", 0), 0o600))
+    except FileExistsError:
         return True
-    open(marker, "w").close()
+    except OSError:
+        return True    # can't keep track: stay quiet rather than repeat
     return False
 
 messages = []

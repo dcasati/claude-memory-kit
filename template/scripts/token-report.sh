@@ -1,5 +1,10 @@
-#!/bin/bash
-# ============================================================================
+#!/usr/bin/env bash
+# shfmt -i 2 -ci -w
+set -Eeuo pipefail
+
+trap exit SIGINT SIGTERM
+
+################################################################################
 # token-report.sh — how much has this project consumed?
 #
 # Sums the token usage and AI credits recorded in GitHub Copilot CLI's local
@@ -15,11 +20,34 @@
 #     official quota and billing are shown by /usage inside Copilot CLI and
 #     on github.com (Settings → Billing);
 #   - AI credits are read from the session's own accounting events.
-# ============================================================================
-set -euo pipefail
 
-DAYS=1
-[ "${1:-}" = "--days" ] && DAYS="${2:-7}"
+################################################################################
+# Default configuration
+REPORT_DAYS=${REPORT_DAYS:-1}
+DEFAULT_DAYS="$REPORT_DAYS"
+################################################################################
 
-HERE="$(cd "$(dirname "$0")" && pwd)"
-PYTHONDONTWRITEBYTECODE=1 python3 "$HERE/copilot_sessions.py" report "$(pwd)" "$DAYS"
+usage() {
+  echo "usage: ${0##*/} [--days N]"
+  echo "    --days N   report the last N days (default ${DEFAULT_DAYS})"
+  exit 1
+}
+
+main() {
+  case "${1:-}" in
+    "") ;;
+    --days) REPORT_DAYS="${2:-}" ;;
+    *) usage ;;
+  esac
+  [[ "$REPORT_DAYS" =~ ^[0-9]+$ ]] || usage
+  command -v python3 >/dev/null 2>&1 || {
+    echo "❌ python3 not found in PATH." >&2
+    exit 1
+  }
+  local _here
+  _here="$(cd "$(dirname "$0")" && pwd)"
+  PYTHONDONTWRITEBYTECODE=1 python3 "$_here/copilot_sessions.py" report "$(pwd)" "$REPORT_DAYS"
+}
+
+main "$@"
+exit 0

@@ -19,7 +19,9 @@ from collections import defaultdict
 
 STATE = os.path.join(os.environ.get("COPILOT_HOME") or os.path.expanduser("~/.copilot"),
                      "session-state")
-DREAM_MARKER = "Use the /dreaming skill"   # first words of dream.sh's prompt
+# First words of a dreaming session (dream.sh's prompt, /dreaming apply,
+# and the prompt used by earlier versions of the kit)
+DREAM_MARKERS = ("/dreaming", "Use the /dreaming skill")
 
 
 def read_workspace(folder):
@@ -67,7 +69,7 @@ def find_sessions(project, days, include_dreams=False):
         info = read_workspace(folder)
         if not belongs(info, project):
             continue
-        if not include_dreams and info.get("name", "").startswith(DREAM_MARKER):
+        if not include_dreams and info.get("name", "").startswith(DREAM_MARKERS):
             continue   # don't dream about previous dreams
         found.append((mtime, events))
     return [path for _, path in sorted(found, reverse=True)]

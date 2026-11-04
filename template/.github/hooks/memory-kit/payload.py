@@ -23,7 +23,25 @@ ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 MEMORY = os.path.join(ROOT, "memory")
 
 WRITE_TOOLS = {"create", "edit", "apply_patch", "write", "multiedit", "str_replace_editor", "notebookedit"}
-SHELL_TOOLS = {"bash", "powershell", "shell"}
+SHELL_TOOLS = {"bash", "powershell", "shell", "write_bash", "write_powershell"}
+
+# Paths the agent must never change: the shared organization memory and the
+# kit's own enforcement files (hooks + skills). Relative to ROOT, lowercase.
+ORG = "memory/organization"
+KIT_FILES = (".github/hooks/memory-kit.json", ".github/hooks/memory-kit",
+             ".github/skills/dreaming", ".github/skills/lesson", ".github/skills/memorize")
+PROTECTED = (ORG,) + KIT_FILES
+
+
+def under(rel, prefix):
+    """True if `rel` is `prefix` or inside it. Case-insensitive: macOS and
+    Windows file systems usually are, so MEMORY/Organization is the same folder."""
+    rel, prefix = rel.lower(), prefix.lower()
+    return rel == prefix or rel.startswith(prefix + "/")
+
+
+def is_protected(rel):
+    return any(under(rel, p) for p in PROTECTED)
 
 
 def read_input():
@@ -81,8 +99,9 @@ class Event:
         return "other"
 
     def command(self):
+        """Shell text: `command` for bash/powershell, `input` for write_bash."""
         if isinstance(self.args, dict):
-            return str(self.args.get("command") or "")
+            return str(self.args.get("command") or self.args.get("input") or "")
         return ""
 
     def patch_text(self):

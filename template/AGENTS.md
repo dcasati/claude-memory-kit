@@ -50,6 +50,9 @@ You (the agent) must follow the rules below in every session.
 - Never put secrets (API keys, passwords, personal data) in `memory/`.
 - Never delete files in `memory/` yourself: cleanup goes through the dreaming
   pass and human approval.
+- Never modify the memory kit's own files (`.github/hooks/memory-kit.json`,
+  `.github/hooks/memory-kit/`, `.github/skills/{dreaming,lesson,memorize}/`):
+  they are the guardrails. Hooks deny or revert such changes; ask the user.
 
 ## Frugality (tokens)
 

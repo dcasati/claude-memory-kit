@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# shfmt -i 2 -ci -w
+# No `set -e` on purpose: a hook must never fail the session it serves.
 # ============================================================================
 # postToolUseFailure + postToolUse hook — the raw material for learning
 # (Lamis Mukta's recommendation: agents must learn from their mistakes;
@@ -10,7 +12,11 @@
 #   - a shell command that exits non-zero → postToolUse "success" whose
 #     output ends with "<… completed with exit code N>".
 # Both end up as one dated line in memory/errors/log.md:
-#   - 2026-07-17 14:02 · bash · "npm run dev" → EADDRINUSE… · session ab12cd34
+#   - 2026-07-17 14:02 · bash · "npm run dev" → exit 1 · session ab12cd34
+# The command's OUTPUT is deliberately not logged: it can contain text from
+# files or web pages, and this log is injected into every new session —
+# logging it would let one hostile output plant "instructions" for good.
+# The full output stays in the session log, where dreaming can look it up.
 # The log is capped at 400 lines (rotation): it is an analysis buffer,
 # not an infinite archive.
 # ============================================================================
@@ -39,14 +45,11 @@ elif ev.kind == "shell":
     # "no match" / "files differ" are answers, not errors
     if m.group(1) == "1" and re.match(r"\s*(grep|egrep|rg|test|\[|diff|cmp|git\s+diff)\b", ev.command()):
         sys.exit(0)
-    output = ev.result_text[:m.start()]
-    output = re.sub(r"<shellId:[^>]*$", "", output).strip()
-    tail = " ".join(output.splitlines()[-3:])
-    message = f"exit {m.group(1)}: {tail}" if tail else f"exit {m.group(1)}"
+    message = f"exit {m.group(1)}"
 else:
     sys.exit(0)
 
-message = payload.flatten(message, 200)
+message = payload.flatten(message, 160)
 # A permission refusal (user or guardrail) is not an agent error.
 if re.search(r"(denied|user doesn.?t want|rejected|user chose|not permitted by user)", message, re.I):
     sys.exit(0)
